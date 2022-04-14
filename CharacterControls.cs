@@ -58,9 +58,8 @@ public class CharacterControls : MonoBehaviour
         Ray wallDetection=new Ray(transform.position, Vector3.forward);
         if (Physics.Raycast(wallDetection, out hit, 1)){
             if(hit.collider.tag=="Climbable"){
-                if (Input.GetKey(KeyCode.Space)){
-                //    movement= new Vector3(moveHorizontal, 10f, moveVertical); used to detect colision
-                    transform.Translate(Vector3.up**)
+                if (Input.GetKeyDown(KeyCode.W)){
+                transform.position +=Vector3.up;
                 }
             }
         }
