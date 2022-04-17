@@ -15,6 +15,9 @@ public class CharacterControls : MonoBehaviour
     public Transform cam; 
     private float ySpeed;
     private float originalStepOffset;
+    private bool haveShoes=false;
+    private bool haveGlider=false;
+
 
   void Start(){
         rb= GetComponent<Rigidbody>();
@@ -22,6 +25,7 @@ public class CharacterControls : MonoBehaviour
     }
 
     // Update is called once per frame
+
     void Update(){
         float moveHorizontal = Input.GetAxis("Horizontal")* Time.deltaTime*speed;
         float moveVertical = Input.GetAxis("Vertical")* Time.deltaTime*speed;
@@ -55,20 +59,37 @@ public class CharacterControls : MonoBehaviour
         }
 
         if (Input.GetKey(KeyCode.LeftShift)){
-            float targetAngle=Mathf.Atan2(movement.x,movement.z)* Mathf.Rad2Deg + cam.eulerAngles.y;// used to rotate the character towards way hes walking
-             Vector3 jumpExtender= Quaternion.Euler(0f, targetAngle, 0f) * new Vector3 (0f,0f,10f); 
-            controller.Move(jumpExtender.normalized * speed * Time.deltaTime);
+            if (haveGlider==true){
+                rb.useGravity=false;
+                float targetAngle=Mathf.Atan2(movement.x,movement.z)* Mathf.Rad2Deg + cam.eulerAngles.y;// used to rotate the character towards way hes walking
+                Vector3 jumpExtender= Quaternion.Euler(0f, targetAngle, 0f) * new Vector3 (0f,0f,20f); 
+                controller.Move(jumpExtender.normalized * speed * Time.deltaTime);
+            }
         }
+       else{
+            rb.useGravity=true;   
+       } 
 
         RaycastHit hit;
         Ray wallDetection=new Ray(transform.position, transform.forward);
         if (Physics.Raycast(wallDetection, out hit, 1)){
-            if (hit.collider.tag=="Climbable"){
+            if (hit.collider.tag=="Climbable" && haveShoes==true){
                 if (Input.GetKey(KeyCode.W)){
                     Vector3 climb=new Vector3(0,0.85f,0);
                     transform.position+=climb;
                 }
             }
+        }
+    }
+     void OnTriggerEnter(Collider other){
+        if (other.gameObject.CompareTag("item")){ 
+            other.gameObject.SetActive(false);
+            haveShoes=true;
+        }
+
+        if (other.gameObject.CompareTag("Glider")){ 
+            other.gameObject.SetActive(false);
+            haveGlider=true;
         }
     }
 }
